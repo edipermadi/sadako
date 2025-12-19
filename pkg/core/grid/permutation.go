@@ -8,7 +8,7 @@ type permutationCtx struct {
 
 func Permutation() []Grid {
 	var ctx permutationCtx
-	ctx.permutation(0, cell.NumberOne, 0)
+	ctx.permutation(EmptyGrid, cell.NumberOne, EmptyMask)
 	return ctx.grids
 }
 

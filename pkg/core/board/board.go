@@ -8,7 +8,7 @@ import (
 
 type Board [9]grid.Grid
 
-func (b *Board) SetGrid(number grid.Grid, value grid.Grid) {
+func (b *Board) SetGrid(number grid.Number, value grid.Grid) {
 	b[number] = value
 }
 
@@ -69,6 +69,18 @@ func (b *Board) IsSolved() bool {
 		}
 	}
 
+	for number := row.NumberOne; number <= row.NumberThree; number++ {
+		if !isSolvedRowGrids(b.RowGrids(number)) {
+			return false
+		}
+	}
+
+	for number := column.NumberOne; number <= column.NumberThree; number++ {
+		if !isSolvedColumnGrids(b.ColumnGrids(number)) {
+			return false
+		}
+	}
+
 	return true
 }
 
@@ -84,7 +96,38 @@ func (b *Board) IsValid() bool {
 			return false
 		}
 	}
+	return true
+}
 
+func isSolvedRowGrids(grids []grid.Grid) bool {
+	if len(grids) < 3 {
+		return false
+	}
+
+	for number := row.NumberOne; number <= row.NumberThree; number++ {
+		mask := grid.NewMask(grids[0].RowValues(number)) |
+			grid.NewMask(grids[1].RowValues(number)) |
+			grid.NewMask(grids[2].RowValues(number))
+		if mask != grid.CompletedGridMask {
+			return false
+		}
+	}
+	return true
+}
+
+func isSolvedColumnGrids(grids []grid.Grid) bool {
+	if len(grids) < 3 {
+		return false
+	}
+
+	for number := column.NumberOne; number <= column.NumberThree; number++ {
+		mask := grid.NewMask(grids[0].ColumnValues(number)) |
+			grid.NewMask(grids[1].ColumnValues(number)) |
+			grid.NewMask(grids[2].ColumnValues(number))
+		if mask != grid.CompletedGridMask {
+			return false
+		}
+	}
 	return true
 }
 
@@ -94,11 +137,10 @@ func isValidRowGrids(grids []grid.Grid) bool {
 	}
 
 	for number := row.NumberOne; number <= row.NumberThree; number++ {
-		var mask grid.Mask
-		for i := 0; i < 3; i++ {
-			mask |= grid.NewMask(grids[i].RowValues(number))
-		}
-		if mask != grid.CompletedGridMask {
+		mask := grid.NewMask(grids[0].RowValues(number)) &
+			grid.NewMask(grids[1].RowValues(number)) &
+			grid.NewMask(grids[2].RowValues(number))
+		if mask > 0 {
 			return false
 		}
 	}
@@ -111,13 +153,13 @@ func isValidColumnGrids(grids []grid.Grid) bool {
 	}
 
 	for number := column.NumberOne; number <= column.NumberThree; number++ {
-		var mask grid.Mask
-		for i := 0; i < 3; i++ {
-			mask |= grid.NewMask(grids[i].ColumnValues(number))
-		}
-		if mask != grid.CompletedGridMask {
+		mask := grid.NewMask(grids[0].ColumnValues(number)) &
+			grid.NewMask(grids[1].ColumnValues(number)) &
+			grid.NewMask(grids[2].ColumnValues(number))
+		if mask > 0 {
 			return false
 		}
+
 	}
 	return true
 }
