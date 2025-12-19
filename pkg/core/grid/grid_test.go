@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGrid_Row(t *testing.T) {
+func TestGrid_RowValues(t *testing.T) {
 	g := grid.NewGrid(
 		[]cell.Value{
 			1, 2, 3,
@@ -18,20 +18,20 @@ func TestGrid_Row(t *testing.T) {
 			7, 8, 9,
 		},
 	)
-	require.Equal(t, []cell.Value{1, 2, 3}, g.Row(row.NumberOne))
-	require.Equal(t, []cell.Value{4, 5, 6}, g.Row(row.NumberTwo))
-	require.Equal(t, []cell.Value{7, 8, 9}, g.Row(row.NumberThree))
+	require.Equal(t, []cell.Value{1, 2, 3}, g.RowValues(row.NumberOne))
+	require.Equal(t, []cell.Value{4, 5, 6}, g.RowValues(row.NumberTwo))
+	require.Equal(t, []cell.Value{7, 8, 9}, g.RowValues(row.NumberThree))
 }
 
-func TestGrid_Column(t *testing.T) {
+func TestGrid_ColumnValues(t *testing.T) {
 	g := grid.NewGrid([]cell.Value{
 		1, 2, 3,
 		4, 5, 6,
 		7, 8, 9,
 	})
-	require.Equal(t, []cell.Value{1, 4, 7}, g.Column(column.NumberOne))
-	require.Equal(t, []cell.Value{2, 5, 8}, g.Column(column.NumberTwo))
-	require.Equal(t, []cell.Value{3, 6, 9}, g.Column(column.NumberThree))
+	require.Equal(t, []cell.Value{1, 4, 7}, g.ColumnValues(column.NumberOne))
+	require.Equal(t, []cell.Value{2, 5, 8}, g.ColumnValues(column.NumberTwo))
+	require.Equal(t, []cell.Value{3, 6, 9}, g.ColumnValues(column.NumberThree))
 }
 
 func TestGrid_CellValue(t *testing.T) {
@@ -88,7 +88,7 @@ func TestGrid_IsSolved(t *testing.T) {
 	}
 }
 
-func TestGrid_Contains(t *testing.T) {
+func TestGrid_ContainsHasCellWithValue(t *testing.T) {
 	g := grid.NewGrid([]cell.Value{
 		1, 2, 3,
 		4, 5, 6,
@@ -96,7 +96,7 @@ func TestGrid_Contains(t *testing.T) {
 	})
 
 	for value := cell.ValueOne; value <= cell.ValueNine; value++ {
-		require.True(t, g.Contains(value))
+		require.True(t, g.HasCellWithValue(value))
 	}
 
 }
@@ -122,13 +122,71 @@ func TestGrid_IsEmpty(t *testing.T) {
 	require.True(t, g.IsEmpty())
 }
 
-func TestGrid_Set(t *testing.T) {
+func TestGrid_SetCellValue(t *testing.T) {
 	g := grid.Grid(0)
 
 	value := cell.ValueOne
 	for number := cell.NumberOne; number <= cell.NumberNine; number++ {
-		g = g.Set(number, value)
+		g = g.SetCellValue(number, value)
 		require.Equal(t, value, g.CellValue(number))
 		value++
 	}
+}
+
+func TestGrid_IsValid(t *testing.T) {
+	type testCase struct {
+		Title         string
+		GivenGrid     grid.Grid
+		ExpectedValue bool
+	}
+
+	testCases := []testCase{
+		{
+			Title: "Solved",
+			GivenGrid: grid.NewGrid([]cell.Value{
+				1, 2, 3,
+				4, 5, 6,
+				7, 8, 9,
+			}),
+			ExpectedValue: true,
+		},
+		{
+			Title:         "Empty",
+			GivenGrid:     grid.Grid(0),
+			ExpectedValue: true,
+		},
+		{
+			Title: "Partial",
+			GivenGrid: grid.NewGrid([]cell.Value{
+				1, 2, 3,
+				4, 5, 6,
+				7, 8, 0,
+			}),
+			ExpectedValue: true,
+		},
+		{
+			Title: "Duplicate",
+			GivenGrid: grid.NewGrid([]cell.Value{
+				1, 2, 3,
+				4, 5, 6,
+				7, 7, 0,
+			}),
+			ExpectedValue: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.Title, func(t *testing.T) {
+			require.Equal(t, tc.ExpectedValue, tc.GivenGrid.IsValid())
+		})
+	}
+}
+
+func TestNewMask(t *testing.T) {
+	mask := grid.NewMask([]cell.Value{
+		1, 2, 3,
+		4, 5, 6,
+		7, 8, 9,
+	})
+	require.Equal(t, grid.CompletedGridMask, mask)
 }

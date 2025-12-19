@@ -20,7 +20,7 @@ func (c *permutationCtx) permutation(grid Grid, number cell.Number, mask Mask) {
 
 	for value := cell.ValueOne; value <= cell.ValueNine; value++ {
 		if !mask.IsSet(value) {
-			c.permutation(grid.Set(number, value), number+1, mask.Set(value))
+			c.permutation(grid.SetCellValue(number, value), number+1, mask.Set(value))
 		}
 	}
 }
