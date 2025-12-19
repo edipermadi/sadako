@@ -1,26 +1,26 @@
 package grid
 
+import "github.com/edipermadi/sadako/pkg/core/cell"
+
 type permutationCtx struct {
 	grids []Grid
 }
 
 func Permutation() []Grid {
 	var ctx permutationCtx
-	ctx.permutation(Grid{}, 0, 0)
+	ctx.permutation(0, cell.NumberOne, 0)
 	return ctx.grids
 }
 
-func (c *permutationCtx) permutation(g Grid, depth int, mask uint32) {
-	if depth >= 9 {
-		c.grids = append(c.grids, g)
+func (c *permutationCtx) permutation(grid Grid, number cell.Number, mask Mask) {
+	if number >= cell.NumberNine {
+		c.grids = append(c.grids, grid)
 		return
 	}
 
-	for i := 1; i <= 9; i++ {
-		if mask&(1<<uint(i)) == 0 {
-			g1 := g
-			g1[depth] = i
-			c.permutation(g1, depth+1, mask|(1<<i))
+	for value := cell.ValueOne; value <= cell.ValueNine; value++ {
+		if !mask.IsSet(value) {
+			c.permutation(grid.Set(number, value), number+1, mask.Set(value))
 		}
 	}
 }

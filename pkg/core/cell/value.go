@@ -1,20 +1,34 @@
 package cell
 
-type Value int
+type Value uint
 
 const (
-	Empty Value = iota
-	One   Value = iota
-	Two   Value = iota
-	Three Value = iota
-	Four  Value = iota
-	Five  Value = iota
-	Six   Value = iota
-	Seven Value = iota
-	Eight Value = iota
-	Nine  Value = iota
+	ValueEmpty Value = iota
+	ValueOne   Value = iota
+	ValueTwo   Value = iota
+	ValueThree Value = iota
+	ValueFour  Value = iota
+	ValueFive  Value = iota
+	ValueSix   Value = iota
+	ValueSeven Value = iota
+	ValueEight Value = iota
+	ValueNine  Value = iota
 )
 
 func (v Value) IsZero() bool {
-	return v == Empty
+	return v == ValueEmpty
 }
+
+type Number uint
+
+const (
+	NumberOne   Number = iota
+	NumberTwo   Number = iota
+	NumberThree Number = iota
+	NumberFour  Number = iota
+	NumberFive  Number = iota
+	NumberSix   Number = iota
+	NumberSeven Number = iota
+	NumberEight Number = iota
+	NumberNine  Number = iota
+)
