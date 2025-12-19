@@ -6,8 +6,6 @@ import (
 	"github.com/edipermadi/sadako/pkg/core/row"
 )
 
-const Size = uint(9)
-
 type Grid uint64
 
 func NewGrid(values []cell.Value) Grid {
@@ -19,11 +17,9 @@ func NewGrid(values []cell.Value) Grid {
 	}
 	return grid
 }
-func (g Grid) CellValue(n cell.Number) cell.Value {
-	if n > cell.NumberNine {
-		return cell.ValueEmpty
-	}
 
+func (g Grid) CellValue(n cell.Number) cell.Value {
+	n = min(cell.NumberNine, n)
 	v := cell.Value((g >> (n * 4)) & 0x0f)
 	return min(v, cell.ValueNine)
 }
@@ -92,4 +88,24 @@ func (g Grid) Column(n column.Number) []cell.Value {
 	default:
 		return nil
 	}
+}
+
+func (g Grid) IsSolved() bool {
+	var mask Mask
+	for number := cell.NumberOne; number <= cell.NumberNine; number++ {
+		value := g.CellValue(number)
+		if value == cell.ValueEmpty || mask.IsSet(value) {
+			return false
+		}
+		mask = mask.Set(value)
+	}
+	return true
+}
+
+func (g Grid) IsEmpty() bool {
+	return g&0xfffffffff == 0
+}
+
+func (g Grid) Equals(v Grid) bool {
+	return g&0xfffffffff == v&0xfffffffff
 }
