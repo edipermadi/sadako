@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/edipermadi/sadako/pkg/core/board"
 	"github.com/edipermadi/sadako/pkg/core/grid"
 	"github.com/rs/zerolog"
 )
@@ -36,5 +37,12 @@ func main() {
 			log.Warn().Err(err).Str("filename", filename).Msg("failed to write grid")
 		}
 		return false
+	})
+
+	_ = board.Permutation(func(g board.Board) (bool, bool) {
+		if _, err := fmt.Fprintf(file, "INSERT INTO boards (g1, g2, g3, g4, g5, g6, g7, g8, g9) VALUES (%d, %d, %d, %d, %d, %d, %d, %d, %d);\n", g[0], g[1], g[2], g[3], g[4], g[5], g[6], g[7], g[8]); err != nil {
+			log.Warn().Err(err).Str("filename", filename).Msg("failed to write board")
+		}
+		return false, false
 	})
 }

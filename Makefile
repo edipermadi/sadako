@@ -1,7 +1,7 @@
 .PHONY: all
-all: db/seed_grids.sql
+all: db/seed.sql
 
-db/seed_grids.sql:
+db/seed.sql:
 	go run ./cmd/seed/main.go $@
 
 .PHONY: test
