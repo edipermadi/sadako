@@ -30,13 +30,11 @@ func main() {
 	}
 	defer func() { _ = file.Close() }()
 
-	ctx := grid.Context{}
-	ctx.Permutation(grid.Grid{})
-	for _, g := range ctx.Grids {
-		if _, err := fmt.Fprintf(file, "INSERT INTO grids (c1, c2, c3, c4, c5, c6, c7, c8, c9) VALUES (%d, %d, %d, %d, %d, %d, %d, %d, %d);\n", g[0], g[1], g[2], g[3], g[4], g[5], g[6], g[7], g[8]); err != nil {
-			log.Fatal().Err(err).Str("filename", filename).Msg("failed to write grid")
-			os.Exit(1)
-			return
+	_ = grid.Permutation(func(g grid.Grid) bool {
+		v := g.Values()
+		if _, err := fmt.Fprintf(file, "INSERT INTO grids (id, c1, c2, c3, c4, c5, c6, c7, c8, c9) VALUES (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d);\n", g, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8]); err != nil {
+			log.Warn().Err(err).Str("filename", filename).Msg("failed to write grid")
 		}
-	}
+		return false
+	})
 }

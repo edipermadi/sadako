@@ -8,12 +8,12 @@ import (
 )
 
 func TestPermutation(t *testing.T) {
-	grids := grid.Permutation()
+	grids := grid.Permutation(nil)
 	require.Equal(t, 362880, len(grids))
 }
 
 func BenchmarkPermutation(b *testing.B) {
 	for b.Loop() {
-		grid.Permutation()
+		grid.Permutation(nil)
 	}
 }

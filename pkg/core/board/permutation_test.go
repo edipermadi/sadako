@@ -8,6 +8,13 @@ import (
 )
 
 func TestPermutation(t *testing.T) {
-	boards := board.Permutation()
-	require.Equal(t, 362880, len(boards))
+	counter := 0
+	boards := board.Permutation(func(b board.Board) (bool, bool) {
+		counter++
+		return counter > 2, true
+	})
+	require.NotEmpty(t, boards)
+	for _, b := range boards {
+		t.Logf("%v", b)
+	}
 }

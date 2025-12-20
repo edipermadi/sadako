@@ -20,14 +20,14 @@ func NewGrid(values []cell.Value) Grid {
 
 func (g Grid) CellValue(n cell.Number) cell.Value {
 	n = min(cell.NumberNine, n)
-	v := cell.Value((g >> (n * 4)) & 0x0f)
+	v := cell.Value((g >> ((cell.NumberNine - n) * 4)) & 0x0f)
 	return min(v, cell.ValueNine)
 }
 
 func (g Grid) SetCellValue(n cell.Number, v cell.Value) Grid {
 	n = min(cell.NumberNine, n)
 	v = min(cell.ValueNine, v)
-	return g | Grid(v)<<Grid(n*4)
+	return g | Grid(v)<<Grid((cell.NumberNine-n)*4)
 }
 
 func (g Grid) HasCellWithValue(v cell.Value) bool {
@@ -132,4 +132,12 @@ func NewMask(values []cell.Value) Mask {
 		}
 	}
 	return mask
+}
+
+func (g Grid) Values() []cell.Value {
+	var values []cell.Value
+	for number := cell.NumberOne; number <= cell.NumberNine; number++ {
+		values = append(values, g.CellValue(number))
+	}
+	return values
 }
