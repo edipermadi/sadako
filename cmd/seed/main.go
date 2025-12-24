@@ -46,11 +46,13 @@ func main() {
 	}
 
 	prefixed := append([]grid.Grid{0}, grids...)
-	for _, h1 := range prefixed {
-		for _, h2 := range prefixed {
-			for _, v1 := range prefixed {
-				for _, v2 := range prefixed {
-					for _, g := range grid.GenerateGrids([]grid.Grid{h1, h2}, []grid.Grid{v1, v2}, grids) {
+	for ih1, h1 := range prefixed {
+		for ih2, h2 := range prefixed {
+			for iv1, v1 := range prefixed {
+				for iv2, v2 := range prefixed {
+					combinations := grid.GenerateGrids([]grid.Grid{h1, h2}, []grid.Grid{v1, v2}, grids)
+					for i, g := range combinations {
+						log.Info().Msgf("generating (%d/%d) of (%d,%d, %d, %d)/%d", i+1, len(combinations), ih1+1, ih2+1, iv1+1, iv2+1, len(prefixed))
 						if _, err := fmt.Fprintf(file, "INSERT INTO positions (g, h1, h2, v1, v2) VALUES (%d, %s, %s, %s, %s);\n", g, formatFn(h1), formatFn(h2), formatFn(v1), formatFn(v2)); err != nil {
 							log.Warn().Err(err).Str("filename", filename).Msg("failed to write grid")
 						}
