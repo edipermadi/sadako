@@ -1,6 +1,7 @@
 package main
 
 import (
+	"compress/gzip"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -30,9 +31,18 @@ func main() {
 	}
 	defer func() { _ = file.Close() }()
 
+	writer, err := gzip.NewWriterLevel(file, gzip.BestCompression)
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to create gzip writer")
+		os.Exit(1)
+		return
+	}
+
+	defer func() { _ = writer.Close() }()
+
 	grids := grid.Permutation(func(g grid.Grid) bool {
 		v := g.Values()
-		if _, err := fmt.Fprintf(file, "INSERT INTO grids (id, c1, c2, c3, c4, c5, c6, c7, c8, c9) VALUES (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d);\n", g, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8]); err != nil {
+		if _, err := fmt.Fprintf(writer, "INSERT INTO grids (id, c1, c2, c3, c4, c5, c6, c7, c8, c9) VALUES (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d);\n", g, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8]); err != nil {
 			log.Warn().Err(err).Str("filename", filename).Msg("failed to write grid")
 		}
 		return true
@@ -52,8 +62,8 @@ func main() {
 				for iv2, v2 := range prefixed {
 					combinations := grid.GenerateGrids([]grid.Grid{h1, h2}, []grid.Grid{v1, v2}, grids)
 					for i, g := range combinations {
-						log.Info().Msgf("generating (%d/%d) of (%d,%d, %d, %d)/%d", i+1, len(combinations), ih1+1, ih2+1, iv1+1, iv2+1, len(prefixed))
-						if _, err := fmt.Fprintf(file, "INSERT INTO positions (g, h1, h2, v1, v2) VALUES (%d, %s, %s, %s, %s);\n", g, formatFn(h1), formatFn(h2), formatFn(v1), formatFn(v2)); err != nil {
+						log.Info().Msgf("generating (%d/%d) of (%d,%d,%d,%d)/%d", i+1, len(combinations), ih1+1, ih2+1, iv1+1, iv2+1, len(prefixed))
+						if _, err := fmt.Fprintf(writer, "INSERT INTO positions (g, h1, h2, v1, v2) VALUES (%d, %s, %s, %s, %s);\n", g, formatFn(h1), formatFn(h2), formatFn(v1), formatFn(v2)); err != nil {
 							log.Warn().Err(err).Str("filename", filename).Msg("failed to write grid")
 						}
 					}
